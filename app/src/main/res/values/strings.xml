@@ -17,4 +17,7 @@
     <string name="default_time">00:00</string>
     <string name="default_takt">0.00 segundos</string>
     <string name="label_nome_placeholder">NOME</string>
+    <string name="msg_producao_iniciada">Produção Iniciada!</string>
+    <string name="msg_erro_campos">Preencha o Operador e a Linha!</string>
+    <string name="msg_erro_inicio">Inicie a produção primeiro!</string>
 </resources>
