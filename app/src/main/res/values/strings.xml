@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">ProvaKotlin</string>
+    <string name="hint_operador">Nome do Operador</string>
+    <string name="hint_linha">Linha de Produção</string>
+    <string name="contagem_de_pecas">Contagem de Peças</string>
+    <string name="btn_iniciar">Iniciar Produção</string>
+    <string name="btn_registrar">Registrar Peça</string>
+    <string name="btn_finalizar">Finalizar Turno e Ver Relatório</string>
+    <string name="relatorio_titulo">RELATÓRIO DE PRODUTIVIDADE</string>
+    <string name="label_operador">OPERADOR</string>
+    <string name="label_linha">LINHA</string>
+    <string name="label_total_pecas">TOTAL DE PEÇAS</string>
+    <string name="label_tempo_total">TEMPO TOTAL</string>
+    <string name="label_takt_time">TAKT TIME (TEMPO MÉDIO)</string>
+    <string name="btn_voltar">NOVA INSPEÇÃO</string>
+    <string name="default_zero">0</string>
+    <string name="default_time">00:00</string>
+    <string name="default_takt">0.00 segundos</string>
+    <string name="label_nome_placeholder">NOME</string>
+</resources>
