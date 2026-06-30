@@ -5,7 +5,9 @@ import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import com.example.provakotlin.viewmodel.MainViewModel
 import com.google.android.material.textfield.TextInputEditText
 
 class MainActivity : AppCompatActivity() {
@@ -18,86 +20,80 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnPeca: Button
     private lateinit var btnFinalizar: Button
 
-    private var contador = 0
-    private var tempoInicio = 0L
+    private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setupViews()
+        setupObservers()
+        setupClickListeners()
+    }
+
+    private fun setupViews() {
         edtOperador = findViewById(R.id.edtOperador)
         edtLinha = findViewById(R.id.edtLinha)
         txtContador = findViewById(R.id.txtContador)
         btnStart = findViewById(R.id.btnStart)
         btnPeca = findViewById(R.id.btnPeca)
         btnFinalizar = findViewById(R.id.btnFinalizar)
+    }
 
-        btnPeca.isEnabled = false
+    private fun setupObservers() {
+        viewModel.contador.observe(this) { count ->
+            txtContador.text = count.toString()
+        }
 
+        viewModel.producaoIniciada.observe(this) { iniciada ->
+            btnPeca.isEnabled = iniciada
+            btnStart.isEnabled = !iniciada
+            edtOperador.isEnabled = !iniciada
+            edtLinha.isEnabled = !iniciada
+        }
+    }
+
+    private fun setupClickListeners() {
         btnStart.setOnClickListener {
             val operador = edtOperador.text.toString()
             val linha = edtLinha.text.toString()
 
             if (operador.isNotEmpty() && linha.isNotEmpty()) {
-                tempoInicio = System.currentTimeMillis()
-                
-                contador = 0
-                txtContador.text = contador.toString()
-
-                edtOperador.isEnabled = false
-                edtLinha.isEnabled = false
-                
-                btnPeca.isEnabled = true
-                btnStart.isEnabled = false
-                
-                Toast.makeText(this, "Produção Iniciada!", Toast.LENGTH_SHORT).show()
+                viewModel.iniciarProducao()
+                Toast.makeText(this, getString(R.string.msg_producao_iniciada), Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Preencha o Operador e a Linha!", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, getString(R.string.msg_erro_campos), Toast.LENGTH_SHORT).show()
             }
         }
 
         btnPeca.setOnClickListener {
-            contador++
-            txtContador.text = contador.toString()
+            viewModel.registrarPeca()
         }
 
         btnFinalizar.setOnClickListener {
-            if (tempoInicio == 0L) {
-                Toast.makeText(this, "Inicie a produção primeiro!", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val tempoFim = System.currentTimeMillis()
-            val tempoTotalMillis = tempoFim - tempoInicio
+            val result = viewModel.finalizarProducao()
             
-            val tempoMedioSegundos = if (contador > 0) {
-                (tempoTotalMillis / 1000.0) / contador
-            } else {
-                0.0
+            if (result == null) {
+                Toast.makeText(this, getString(R.string.msg_erro_inicio), Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
 
             val intent = Intent(this, RelatorioActivity::class.java).apply {
                 putExtra("OPERADOR", edtOperador.text.toString())
                 putExtra("LINHA", edtLinha.text.toString())
-                putExtra("PECAS", contador)
-                putExtra("TEMPO_TOTAL", tempoTotalMillis)
-                putExtra("TEMPO_MEDIO", tempoMedioSegundos)
+                putExtra("PECAS", result.totalPecas)
+                putExtra("TEMPO_TOTAL", result.tempoTotalMillis)
+                putExtra("TEMPO_MEDIO", result.tempoMedioSegundos)
             }
             startActivity(intent)
             
-            resetApp()
+            resetUI()
         }
     }
 
-    private fun resetApp() {
-        btnStart.isEnabled = true
-        btnPeca.isEnabled = false
-        edtOperador.isEnabled = true
-        edtLinha.isEnabled = true
+    private fun resetUI() {
+        viewModel.reset()
         edtOperador.text?.clear()
         edtLinha.text?.clear()
-        contador = 0
-        txtContador.text = "0"
-        tempoInicio = 0L
     }
 }
